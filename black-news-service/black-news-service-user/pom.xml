@@ -12,7 +12,7 @@
     <artifactId>black-news-service-user</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>black-news-service-user-api</module>
+        <module>black-news-service-user-server</module>
     </modules>
 
     <properties>
