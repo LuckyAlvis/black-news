@@ -9,6 +9,7 @@ import com.shenzhen.dai.model.common.enums.AppHttpCodeEnum;
 import com.shenzhen.dai.model.user.dtos.LoginDto;
 import com.shenzhen.dai.model.user.pojos.ApUser;
 import com.shenzhen.dai.service.UserService;
+import com.shuwei.dai.AppJwtUtil;
 import com.shuwei.dai.ObjectService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -39,8 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, ApUser> implements 
         // 1.3比对密码
         if (eq(DigestUtils.md5DigestAsHex(passwd.getBytes()), DigestUtils.md5DigestAsHex((salt + loginDto.getPassword()).getBytes()))) {
             // 1.4返回数据(JWT token)
-//            String token = AppJwtUtil.getToken(dbUser.getId().longValue());
-            String token = "token_str";
+            String token = AppJwtUtil.getToken(dbUser.getId().longValue());
             Map<String, Object> map = new HashMap<>();
             map.put("token", token);
             dbUser.setSalt(" ");
