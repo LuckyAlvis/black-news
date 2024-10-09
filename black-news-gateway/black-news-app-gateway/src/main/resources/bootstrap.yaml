@@ -1,0 +1,17 @@
+server:
+  port: 51601
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: black-news-app-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
