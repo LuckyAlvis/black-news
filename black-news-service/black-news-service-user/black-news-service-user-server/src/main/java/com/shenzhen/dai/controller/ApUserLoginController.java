@@ -21,7 +21,7 @@ public class ApUserLoginController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/login_auth")
+    @PostMapping("/login_auth/")
     public ResponseResult<?> login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto);
     }
