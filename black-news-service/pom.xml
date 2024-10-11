@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>black-news-service-user</module>
+        <module>black-news-service-article</module>
     </modules>
 
     <properties>

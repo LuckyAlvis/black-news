@@ -6,8 +6,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class BlackNewsUserService {
+public class BlackNewsUserApplication {
     public static void main(String[] args) {
-        SpringApplication.run(BlackNewsUserService.class, args);
+        SpringApplication.run(BlackNewsUserApplication.class, args);
     }
 }
