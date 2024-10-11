@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.shenzhen.dai</groupId>
-        <artifactId>black-news-test</artifactId>
+        <artifactId>black-news-starter</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>minio-demo</artifactId>
+    <artifactId>black-news-starter-file</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -19,22 +19,25 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.shenzhen.dai</groupId>
-            <artifactId>black-news-starter-file</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
-
 </project>

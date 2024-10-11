@@ -1,6 +1,7 @@
 package com.shuwei.dai.test;
 
 import com.shenzhen.dai.MinIOApplication;
+import com.shenzhen.dai.service.FileStorageService;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.errors.*;
@@ -13,6 +14,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
@@ -48,5 +50,21 @@ public class MinIOTest {
         minioClient.putObject(putObjectArgs);
     }
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    @Test
+    public void testUpdateImgFile() {
+        try {
+            Resource resource = resourceLoader.getResource("classpath:list.html");  // 根据文件路径
+            InputStream inputStream = new FileInputStream(resource.getFile());
+            String filePath = fileStorageService.uploadHtmlFile("", "list.html", inputStream);
+            System.out.println(filePath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
