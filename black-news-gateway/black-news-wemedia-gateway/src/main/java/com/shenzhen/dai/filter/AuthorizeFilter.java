@@ -41,6 +41,11 @@ public class AuthorizeFilter implements Ordered, GlobalFilter, ObjectService {
         //5.判断token是否有效
         try {
             Claims claimsBody = AppJwtUtil.getClaimsBody(token);
+            Object userId = claimsBody.get("id");
+            ServerHttpRequest httpRequest = request.mutate().headers(headers -> {
+                headers.add("userId", userId + "");
+            }).build();
+            exchange.mutate().request(httpRequest).build();
             //是否是过期
             int result = AppJwtUtil.verifyToken(claimsBody);
             if (result == 1 || result == 2) {
