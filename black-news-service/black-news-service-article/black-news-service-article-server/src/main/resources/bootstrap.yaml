@@ -10,3 +10,6 @@ spring:
       config:
         server-addr: localhost:8848
         file-extension: yaml
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

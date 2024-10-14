@@ -10,3 +10,12 @@ minio:
   bucket: black
   endpoint: http://localhost:9000
   readPath: http://localhost:9000
+mybatis-plus:
+  global-config:
+    sequence:
+      #      数据中心id 取值0-31
+      datacenter-id: 1
+      #      机器id 取值0-31
+      worker-id: 1
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
