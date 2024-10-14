@@ -1,0 +1,5 @@
+server:
+  port: 51803
+spring:
+  application:
+    name: black-news-wemedia
