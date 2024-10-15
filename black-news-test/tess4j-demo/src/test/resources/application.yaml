@@ -1,0 +1,6 @@
+minio:
+  accessKey: Kjcacew7Jq5x5vk0UfEY
+  secretKey: UHrHzJADSIqZcj4eATNFMIkl2yA9grXsuXm3j8DA
+  bucket: black
+  endpoint: http://localhost:9000
+  readPath: http://localhost:9000
