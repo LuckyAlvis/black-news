@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,22 +83,23 @@ public class UploadFileToMinIoTest {
     @Test
     public void uploadArticleHtml() throws TemplateException, IOException {
         // 获取文章详情
-        ApArticleContent apArticleContent = apArticleContentMapper.selectOne(Wrappers.<ApArticleContent>lambdaQuery()
-                .eq(ApArticleContent::getArticleId, 1302862387124125698L));
-        // 拿到freemarker模版
-        Template template = configuration.getTemplate("article.ftl");
-        // 数据模型
-        Map<String, Object> content = new HashMap<>();
-        content.put("content", JSONObject.parseArray(apArticleContent.getContent()));
-        StringWriter stringWriter = new StringWriter();
-        // 合成html文件
-        template.process(content, stringWriter);
-        InputStream inputStream = new ByteArrayInputStream(stringWriter.toString().getBytes());
-        String path = fileStorageService.uploadHtmlFile("", apArticleContent.getArticleId() + ".html", inputStream);
-        System.out.println("path = " + path);
-        // 把path落库
-        apArticleMapper.update(Wrappers.<ApArticle>lambdaUpdate()
-                .eq(ApArticle::getId, apArticleContent.getArticleId())
-                .set(ApArticle::getStaticUrl, path));
+        List<ApArticleContent> apArticleContentList = apArticleContentMapper.selectList(Wrappers.lambdaQuery());
+        for (ApArticleContent apArticleContent : apArticleContentList) {
+            // 拿到freemarker模版
+            Template template = configuration.getTemplate("article.ftl");
+            // 数据模型
+            Map<String, Object> content = new HashMap<>();
+            content.put("content", JSONObject.parseArray(apArticleContent.getContent()));
+            StringWriter stringWriter = new StringWriter();
+            // 合成html文件
+            template.process(content, stringWriter);
+            InputStream inputStream = new ByteArrayInputStream(stringWriter.toString().getBytes());
+            String path = fileStorageService.uploadHtmlFile("", apArticleContent.getArticleId() + ".html", inputStream);
+            System.out.println("path = " + path);
+            // 把path落库
+            apArticleMapper.update(Wrappers.<ApArticle>lambdaUpdate()
+                    .eq(ApArticle::getId, apArticleContent.getArticleId())
+                    .set(ApArticle::getStaticUrl, path));
+        }
     }
 }
