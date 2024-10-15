@@ -3,3 +3,6 @@ server:
 spring:
   application:
     name: black-news-wemedia
+tess4j:
+  data-path: /Users/ivan/Downloads
+  language: chi_sim
