@@ -20,6 +20,7 @@ import com.shenzhen.dai.model.wemedia.pojos.WmNewsMaterial;
 import com.shenzhen.dai.wemedia.mapper.WmMaterialMapper;
 import com.shenzhen.dai.wemedia.mapper.WmNewsMapper;
 import com.shenzhen.dai.wemedia.mapper.WmNewsMaterialMapper;
+import com.shenzhen.dai.wemedia.service.WmNewsAutoScanService;
 import com.shenzhen.dai.wemedia.service.WmNewsService;
 import com.shuwei.dai.utils.thread.WmThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
     private WmMaterialMapper wmMaterialMapper;
     @Autowired
     private WmNewsMaterialMapper wmNewsMaterialMapper;
+
+    @Autowired
+    private WmNewsAutoScanService wmNewsAutoScanService;
 
     /**
      * 条件查询文章列表
@@ -141,7 +145,8 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
         //4.不是草稿，保存文章封面图片与素材的关系，如果当前布局是自动，需要匹配封面图片
         saveRelativeInfoForCover(dto, wmNews, materials);
-
+        // 自动审核
+        wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
 
     }
