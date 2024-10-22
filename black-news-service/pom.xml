@@ -15,6 +15,7 @@
         <module>black-news-service-user</module>
         <module>black-news-service-article</module>
         <module>black-news-service-wemedia</module>
+        <module>black-news-service-schedule</module>
     </modules>
 
     <properties>

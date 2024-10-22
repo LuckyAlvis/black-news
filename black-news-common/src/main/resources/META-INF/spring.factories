@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.shenzhen.dai.common.exception.ExceptionCatch,\
-  com.shenzhen.dai.common.tess4j.Tess4jClient
+  com.shenzhen.dai.common.tess4j.Tess4jClient,\
+  com.shenzhen.dai.common.redis.CacheService
