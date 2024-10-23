@@ -106,4 +106,51 @@ public class TaskServiceImpl implements TaskService {
         }
         return flag;
     }
+
+    @Override
+    public boolean cancelTask(long taskId) {
+        boolean flag = false;
+        // 删除任务，更新任务日志
+        Task task = updateDb(taskId, ScheduleConstants.CANCELLED);
+        if (task != null) {
+            removeTaskFromCache(task);
+            flag = true;
+        }
+        return flag;
+    }
+
+    /**
+     * 删除redis中的数据
+     *
+     * @param task
+     */
+    private void removeTaskFromCache(Task task) {
+        String key = task.getTaskType() + "_" + task.getPriority();
+        if (task.getExecuteTime() <= System.currentTimeMillis()) {
+            cacheService.lRemove(ScheduleConstants.TOPIC + key, 0, JSON.toJSONString(task));
+        } else {
+            cacheService.zRemove(ScheduleConstants.TOPIC + key, JSON.toJSONString(task));
+        }
+    }
+
+    private Task updateDb(long taskId, int status) {
+
+        Task task = null;
+        try {
+            // 删除任务
+            taskinfoMapper.deleteById(taskId);
+
+            // 更新任务日志
+            TaskinfoLogs taskinfoLogs = taskinfoLogsMapper.selectById(taskId);
+            taskinfoLogs.setStatus(status);
+            taskinfoLogsMapper.updateById(taskinfoLogs);
+            task = new Task();
+            BeanUtils.copyProperties(taskinfoLogs, task);
+            task.setExecuteTime(taskinfoLogs.getExecuteTime().getTime());
+        } catch (Exception e) {
+            log.error("task cancel error, taskId={}", taskId, e);
+        }
+        return task;
+
+    }
 }

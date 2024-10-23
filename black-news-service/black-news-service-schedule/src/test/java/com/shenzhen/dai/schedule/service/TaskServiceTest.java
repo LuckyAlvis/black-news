@@ -29,4 +29,9 @@ public class TaskServiceTest {
         long taskId = taskService.addTask(task);
         System.out.println("taskId = " + taskId);
     }
+
+    @Test
+    public void cancelTask() {
+        taskService.cancelTask(1848957616347496449L);
+    }
 }

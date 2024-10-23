@@ -11,5 +11,13 @@ public interface TaskService {
      */
     long addTask(Task task);
 
+    /**
+     * 取消任务
+     *
+     * @param taskId
+     * @return
+     */
+    boolean cancelTask(long taskId);
+
 
 }
