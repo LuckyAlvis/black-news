@@ -9,6 +9,7 @@ import com.shenzhen.dai.model.schedule.TaskinfoLogs;
 import com.shenzhen.dai.schedule.mapper.TaskinfoLogsMapper;
 import com.shenzhen.dai.schedule.mapper.TaskinfoMapper;
 import com.shenzhen.dai.schedule.service.TaskService;
+import com.shuwei.dai.ObjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import java.util.Date;
 @Service
 @Transactional(rollbackFor = Exception.class)
 @Slf4j
-public class TaskServiceImpl implements TaskService {
+public class TaskServiceImpl implements TaskService, ObjectService {
     @Override
     public long addTask(Task task) {
         // 1.添加任务到数据库
@@ -119,6 +120,24 @@ public class TaskServiceImpl implements TaskService {
         return flag;
     }
 
+    @Override
+    public Task pull(int type, int priority) {
+        Task task = null;
+        String key = type + "_" + priority;
+        try {
+            // 从redis中拉取数据
+            String taskJson = cacheService.lRightPop(ScheduleConstants.TOPIC + key);
+            if (notBlank(taskJson)) {
+                task = JSON.parseObject(taskJson, Task.class);
+                // 修改数据库信息
+                updateDb(task.getTaskId(), ScheduleConstants.EXECUTED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("task pull error", e);
+        }
+        return task;
+    }
     /**
      * 删除redis中的数据
      *

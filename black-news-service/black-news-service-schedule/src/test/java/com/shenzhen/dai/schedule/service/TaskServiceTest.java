@@ -25,7 +25,7 @@ public class TaskServiceTest {
         task.setParameters("task test".getBytes());
 //        task.setExecuteTime(new Date().getTime());
 //        task.setExecuteTime(new Date().getTime() + 500);
-        task.setExecuteTime(new Date().getTime() + 500000);
+        task.setExecuteTime(new Date().getTime());
         long taskId = taskService.addTask(task);
         System.out.println("taskId = " + taskId);
     }
@@ -33,5 +33,11 @@ public class TaskServiceTest {
     @Test
     public void cancelTask() {
         taskService.cancelTask(1848957616347496449L);
+    }
+
+    @Test
+    public void pull() {
+        Task task = taskService.pull(100, 50);
+        System.out.println("task = " + task);
     }
 }

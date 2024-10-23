@@ -19,5 +19,12 @@ public interface TaskService {
      */
     boolean cancelTask(long taskId);
 
-
+    /**
+     * 拉取任务
+     *
+     * @param type
+     * @param priority
+     * @return
+     */
+    Task pull(int type, int priority);
 }
