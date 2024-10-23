@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class CacheService extends CachingConfigurerSupport {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    private PathPatternParser mvcPatternParser;
 
     public StringRedisTemplate getstringRedisTemplate() {
         return this.stringRedisTemplate;
@@ -1358,20 +1360,18 @@ public class CacheService extends CachingConfigurerSupport {
      * @return
      */
     public Set<String> scan(String patten) {
-//        Set<String> keys = stringRedisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-//            Set<String> result = new HashSet<>();
-//            try (Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder()
-//                    .match(patten).count(10000).build())) {
-//                while (cursor.hasNext()) {
-//                    result.add(new String(cursor.next()));
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return result;
-//        });
-//        return keys;
-        return new HashSet<>();
+        Set<String> keys = stringRedisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> result = new HashSet<>();
+            try (Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions()
+                    .match(patten).count(10000).build())) {
+                while (cursor.hasNext()) {
+                    result.add(new String(cursor.next()));
+                }
+            }
+            return result;
+        });
+        return keys;
+
     }
 
     /**
