@@ -13,11 +13,13 @@ import com.shuwei.dai.ObjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @description:
@@ -171,5 +173,23 @@ public class TaskServiceImpl implements TaskService, ObjectService {
         }
         return task;
 
+    }
+
+    @Scheduled(cron = "0 */1 * * * *")
+    void refresh() {
+        log.info("未来数据刷新----定时任务");
+        // 获取所有未来数据的集合key
+        Set<String> futureKeys = cacheService.scan(ScheduleConstants.FUTURE + "*");
+        for (String futureKey : futureKeys) {
+            // 获取当前list数据的key
+            String topicKey = ScheduleConstants.TOPIC + futureKey.split(ScheduleConstants.FUTURE)[1];
+
+            // 按照key和分值查询符合条件的数据
+            Set<String> tasks = cacheService.zRangeByScore(futureKey, 0, System.currentTimeMillis());
+            if (notEmpty(tasks)) {
+                cacheService.refreshWithPipeline(futureKey, topicKey, tasks);
+                log.info("成功刷新{}到{}", futureKey, topicKey);
+            }
+        }
     }
 }
