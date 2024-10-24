@@ -1432,7 +1432,7 @@ public class CacheService extends CachingConfigurerSupport {
             if (result != null && result)
                 return token;
         } finally {
-            RedisConnectionUtils.releaseConnection(conn, factory, false);
+            RedisConnectionUtils.releaseConnection(conn, factory);
         }
         return null;
     }
