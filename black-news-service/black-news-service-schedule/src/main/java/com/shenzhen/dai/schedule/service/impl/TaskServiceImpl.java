@@ -1,6 +1,7 @@
 package com.shenzhen.dai.schedule.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.shenzhen.dai.common.constant.ScheduleConstants;
 import com.shenzhen.dai.common.redis.CacheService;
 import com.shenzhen.dai.model.schedule.Task;
@@ -10,6 +11,7 @@ import com.shenzhen.dai.schedule.mapper.TaskinfoLogsMapper;
 import com.shenzhen.dai.schedule.mapper.TaskinfoMapper;
 import com.shenzhen.dai.schedule.service.TaskService;
 import com.shuwei.dai.ObjectService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -177,19 +180,59 @@ public class TaskServiceImpl implements TaskService, ObjectService {
 
     @Scheduled(cron = "0 */1 * * * *")
     void refresh() {
-        log.info("未来数据刷新----定时任务");
-        // 获取所有未来数据的集合key
-        Set<String> futureKeys = cacheService.scan(ScheduleConstants.FUTURE + "*");
-        for (String futureKey : futureKeys) {
-            // 获取当前list数据的key
-            String topicKey = ScheduleConstants.TOPIC + futureKey.split(ScheduleConstants.FUTURE)[1];
+        // 在分布式系统中，一个方法在同一时间只能被一台机器的一个线程执行
+        // trylock方法主要是使用redis的setnx的特性完成分布式锁的功能
+        // A获取到锁以后，其他客户端不能操作，必须等获取到锁的客户端释放锁以后才能操作
+        String lock = cacheService.tryLock("FUTURE_TASK_SYNC", 30 * 1000);
+        if (notBlank(lock)) {
 
-            // 按照key和分值查询符合条件的数据
-            Set<String> tasks = cacheService.zRangeByScore(futureKey, 0, System.currentTimeMillis());
-            if (notEmpty(tasks)) {
-                cacheService.refreshWithPipeline(futureKey, topicKey, tasks);
-                log.info("成功刷新{}到{}", futureKey, topicKey);
+            log.info("未来数据刷新----定时任务");
+            // 获取所有未来数据的集合key
+            Set<String> futureKeys = cacheService.scan(ScheduleConstants.FUTURE + "*");
+            for (String futureKey : futureKeys) {
+                // 获取当前list数据的key
+                String topicKey = ScheduleConstants.TOPIC + futureKey.split(ScheduleConstants.FUTURE)[1];
+
+                // 按照key和分值查询符合条件的数据
+                Set<String> tasks = cacheService.zRangeByScore(futureKey, 0, System.currentTimeMillis());
+                if (notEmpty(tasks)) {
+                    cacheService.refreshWithPipeline(futureKey, topicKey, tasks);
+                    log.info("成功刷新{}到{}", futureKey, topicKey);
+                }
             }
         }
+    }
+
+    /**
+     *
+     */
+    @PostConstruct
+    @Scheduled(cron = "0 */5 * * * *")
+    public void reloadData() {
+        // 清理缓存中的数据
+        clearCache();
+        // 查询符合条件的任务：小于未来5分钟的数据
+        // 获取5分钟后的时间毫秒值
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 5);
+        long nextScheduleTime = calendar.getTimeInMillis();
+        List<Taskinfo> taskinfos = taskinfoMapper.selectList(Wrappers.<Taskinfo>lambdaQuery().lt(Taskinfo::getExecuteTime, nextScheduleTime));
+        // 把这些数据添加到redis中
+        if (notEmpty(taskinfos)) {
+            for (Taskinfo taskinfo : taskinfos) {
+                Task task = new Task();
+                BeanUtils.copyProperties(taskinfo, task);
+                task.setExecuteTime(taskinfo.getExecuteTime().getTime());
+                addTaskToCache(task);
+            }
+        }
+        log.info("数据库中的数据同步到了redis中");
+    }
+
+    public void clearCache() {
+        Set<String> topicKeys = cacheService.scan(ScheduleConstants.TOPIC + "*");
+        Set<String> futureKeys = cacheService.scan(ScheduleConstants.FUTURE + "*");
+        cacheService.delete(topicKeys);
+        cacheService.delete(futureKeys);
     }
 }
