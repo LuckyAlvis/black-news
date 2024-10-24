@@ -22,6 +22,8 @@ import com.shenzhen.dai.wemedia.mapper.WmNewsMapper;
 import com.shenzhen.dai.wemedia.mapper.WmNewsMaterialMapper;
 import com.shenzhen.dai.wemedia.service.WmNewsAutoScanService;
 import com.shenzhen.dai.wemedia.service.WmNewsService;
+import com.shenzhen.dai.wemedia.service.WmNewsTaskService;
+import com.shuwei.dai.ObjectService;
 import com.shuwei.dai.utils.thread.WmThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +41,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @Transactional
-public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> implements WmNewsService {
+public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> implements ObjectService, WmNewsService {
 
     @Autowired
     private WmMaterialMapper wmMaterialMapper;
@@ -101,6 +103,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         return responseResult;
     }
 
+    @Autowired
+    private WmNewsTaskService wmNewsTaskService;
+
     /**
      * 发布修改文章或保存为草稿
      *
@@ -111,7 +116,7 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
     public ResponseResult submitNews(WmNewsDto dto) {
 
         //0.条件判断
-        if (dto == null || dto.getContent() == null) {
+        if (dto == null || dto.getContent() == null || isNull(dto.getPublishTime())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
         }
 
@@ -146,7 +151,8 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         //4.不是草稿，保存文章封面图片与素材的关系，如果当前布局是自动，需要匹配封面图片
         saveRelativeInfoForCover(dto, wmNews, materials);
         // 自动审核
-        wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
+//        wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
+        wmNewsTaskService.addNewTask(wmNews.getId(), wmNews.getPublishTime());
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
 
     }

@@ -216,7 +216,7 @@ public class TaskServiceImpl implements TaskService, ObjectService {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 5);
         long nextScheduleTime = calendar.getTimeInMillis();
-        List<Taskinfo> taskinfos = taskinfoMapper.selectList(Wrappers.<Taskinfo>lambdaQuery().lt(Taskinfo::getExecuteTime, nextScheduleTime));
+        List<Taskinfo> taskinfos = taskinfoMapper.selectList(Wrappers.<Taskinfo>lambdaQuery().lt(Taskinfo::getExecuteTime, new Date(nextScheduleTime)));
         // 把这些数据添加到redis中
         if (notEmpty(taskinfos)) {
             for (Taskinfo taskinfo : taskinfos) {
