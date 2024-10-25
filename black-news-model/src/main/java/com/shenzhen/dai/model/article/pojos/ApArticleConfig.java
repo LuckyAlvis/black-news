@@ -20,7 +20,7 @@ import java.io.Serializable;
 @TableName("ap_article_config")
 public class ApArticleConfig implements Serializable {
     public ApArticleConfig(Long id) {
-        this.id = id;
+        this.articleId = id;
         this.isDelete = false;
         this.isDown = false;
         this.isComment = true;
