@@ -1,4 +1,4 @@
-package com.shenzhen.dai;
+package com.shenzhen.dai.sample.stream;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -12,7 +12,7 @@ import java.util.Properties;
 /**
  * 消费者
  */
-public class ConsumerQuickStart {
+public class KafkaConsumerQuickStart {
 
     public static void main(String[] args) {
         //1.添加kafka的配置信息
@@ -31,7 +31,7 @@ public class ConsumerQuickStart {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
 
         //3.订阅主题
-        consumer.subscribe(Collections.singletonList("topic-black"));
+        consumer.subscribe(Collections.singletonList("stream-topic-output"));
 
         //当前线程一直处于监听状态
         /*while (true) {

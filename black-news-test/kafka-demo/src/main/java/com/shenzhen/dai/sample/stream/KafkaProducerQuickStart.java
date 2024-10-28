@@ -1,4 +1,4 @@
-package com.shenzhen.dai;
+package com.shenzhen.dai.sample.stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -15,7 +15,7 @@ docker run -d --name kafka --network kafka-net -p 9092:9092 -e KAFKA_BROKER_ID=0
 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e TZ="Asia/Shanghai" wurstmeister/kafka
  */
 @Slf4j
-public class ProducerQuickStart {
+public class KafkaProducerQuickStart {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         // 1.kafka配置信息
         Properties prop = new Properties();
@@ -33,7 +33,7 @@ public class ProducerQuickStart {
         // 2.创建kafka生产者对象
         KafkaProducer<String, String> producer = new KafkaProducer<>(prop);
         for (int i = 0; i < 10; i++) {
-            ProducerRecord<String, String> record = new ProducerRecord<>("topic-black", "100001", "hello-kafka,hahaha" + i);
+            ProducerRecord<String, String> record = new ProducerRecord<>("stream-topic-input", "100001", "hello hahaha" + i);
             producer.send(record);
         }
         producer.close();
