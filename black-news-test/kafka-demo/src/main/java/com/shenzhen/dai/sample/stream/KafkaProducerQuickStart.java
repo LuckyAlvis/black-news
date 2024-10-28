@@ -33,7 +33,7 @@ public class KafkaProducerQuickStart {
         // 2.创建kafka生产者对象
         KafkaProducer<String, String> producer = new KafkaProducer<>(prop);
         for (int i = 0; i < 10; i++) {
-            ProducerRecord<String, String> record = new ProducerRecord<>("stream-topic-input", "100001", "hello hahaha" + i);
+            ProducerRecord<String, String> record = new ProducerRecord<>("stream-topic-input", "100001", "hello hahaha");
             producer.send(record);
         }
         producer.close();
